@@ -13,25 +13,21 @@
 	<groupId>br.com.makersweb</groupId>
 	<artifactId>poc-spring-boot-aws-localstack</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>[PoC] - Spring Boot API</name>
-
-	<developers>
-		<developer>
-			<email>noreply@makersweb.com.br</email>
-			<id>aaristides</id>
-			<name>Anderson Orione Aristides</name>
-			<url>https://www.makersweb.com.br</url>
-		</developer>
-	</developers>
+	<name>poc-spring-boot-aws-localstack</name>
+	<description>Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>20</java.version>
 		<maven.compiler.source>20</maven.compiler.source>
 		<maven.compiler.target>20</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-cloud.version>2021.0.7</spring-cloud.version>
 		<spring.cloud.aws.version>2.4.4</spring.cloud.aws.version>
+		<spotify.dockerfile.version>1.4.13</spotify.dockerfile.version>
+		<logbook.version>2.14.0</logbook.version>
 		<logs.path>./logs</logs.path>
 	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -65,15 +61,22 @@
 		</dependency>
 		<dependency>
 			<groupId>io.awspring.cloud</groupId>
-			<artifactId>spring-cloud-starter-aws-parameter-store-config</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>io.awspring.cloud</groupId>
-			<artifactId>spring-cloud-starter-aws-secrets-manager-config</artifactId>
+			<artifactId>spring-cloud-starter-aws-messaging</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.spotify</groupId>
+			<artifactId>dockerfile-maven-plugin</artifactId>
+			<version>${spotify.dockerfile.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.zalando</groupId>
+			<artifactId>logbook-spring-boot-starter</artifactId>
+			<version>${logbook.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -95,6 +98,37 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<profiles>
+		<profile>
+			<id>docker</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.spotify</groupId>
+						<artifactId>dockerfile-maven-plugin</artifactId>
+						<version>1.4.13</version>
+						<executions>
+							<execution>
+								<id>default</id>
+								<goals>
+									<goal>build</goal>
+									<goal>push</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<repository>makersweb/${project.build.finalName}</repository>
+							<tag>${project.version}</tag>
+							<buildArgs>
+								<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
+							</buildArgs>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<build>
 		<finalName>poc-spring-boot-aws-localstack</finalName>

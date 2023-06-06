@@ -1,6 +1,6 @@
 spring:
   application:
-    name: poc-spring-boot-aws-localstack
+    name: bff-marvel-api
 ---
 spring:
   config:
